@@ -13,7 +13,6 @@ CHROME_USER_DATA_TEMPLATE = r"C:\chrome-temp\session-%d"
 DEBUG_PORT_BASE = 9000  # 浏览器启动的port
 TASK_PATH = "tasks.csv" # 任务文件
 MAX_CONCURRENT = 8      # 同时执行的进程数：一次打开的网页数量
-PRICE_TH = 2000         # 价格阈值：超过此价格则不继续出价
 INTERVAL_SECONDS = 60   # 监控间隔时间
 
 
@@ -27,7 +26,8 @@ def read_tasks(csv_path):
         for row in reader:
             task = {
                 "url": row["url"],
-                "my_code": row["my_code"]
+                "my_code": row["my_code"],
+                "price_th":row["price_th"]
             }
             tasks.append(task)
     return tasks
@@ -70,6 +70,7 @@ def process_task(task_idx_url_my_code):
     idx, task = task_idx_url_my_code
     url = task["url"]
     my_code = task["my_code"]
+    price_th = int(task["price_th"])
     debug_port = DEBUG_PORT_BASE + idx
 
     # 启动Chrome（如果没启动）
@@ -77,7 +78,7 @@ def process_task(task_idx_url_my_code):
         chrome_proc_dict[idx] = start_chrome(idx, url)
 
     try:
-        result = safe_run_bid_with_timeout(my_code, debug_port, PRICE_TH, url, idx)
+        result = safe_run_bid_with_timeout(my_code, debug_port, price_th, url, idx)
         if not result:
             print(f"⚠️[任务 {idx}] 未捕获竞价信息，准备重试...")
             restart_chrome(idx, url)
