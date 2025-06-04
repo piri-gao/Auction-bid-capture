@@ -19,7 +19,7 @@ def pop_win_process(driver, task_num):
         print(f"✅ [任务 {task_num}] 点击了弹窗的‘我知道了’按钮")
     except Exception as e:
         print(f"⚠️ [任务 {task_num}]  没有检测到‘我知道了’按钮，可能弹窗没有出现")
-        print("错误信息：", e)
+        # print("错误信息：", e)
 
 def get_highest_price(driver, task_num):
     try:
@@ -42,7 +42,7 @@ def get_highest_price(driver, task_num):
         return False
     except Exception as e:
         print(f"⚠️ [任务 {task_num}] 获取出价信息时出错")
-        print("错误信息：", e)
+        # print("错误信息：", e)
         return False
 
 def write_to_csv(url, bid_code, price_value, bid_time, need_bid, task_num=0, csv_path="bids.csv"):
@@ -83,7 +83,6 @@ def offer_price(driver, task_num):
     pass
 
 def run_bid(my_code, debug_port, price_th, url, task_num=0):
-    sys.stderr = open(os.devnull, 'w')
     # 配置浏览器
     options = Options()
     options.add_argument("--headless")  # 如想看到浏览器界面可注释掉此行
@@ -91,7 +90,7 @@ def run_bid(my_code, debug_port, price_th, url, task_num=0):
     options.add_argument("--no-sandbox")
     options.add_experimental_option("debuggerAddress", "127.0.0.1:{}".format(debug_port))
     driver_path = "./chromedriver.exe" 
-    service = Service(driver_path)
+    service = Service(driver_path, log_path=os.devnull)
     # 启动浏览器
     driver  = webdriver.Chrome(service=service, options=options)
     
@@ -103,6 +102,7 @@ def run_bid(my_code, debug_port, price_th, url, task_num=0):
         return False
     else:
         bid_code, price_value, bid_time = result
+    
     if bid_code and bid_code != my_code and price_value and price_value < price_th:
         need_bid = "True"
         offer_price(driver, task_num)
