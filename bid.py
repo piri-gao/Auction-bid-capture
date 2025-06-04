@@ -94,8 +94,6 @@ def run_bid(my_code, debug_port, price_th, url, task_num=0):
     # 启动浏览器
     driver  = webdriver.Chrome(service=service, options=options)
     
-    # 等待页面动态内容加载完成
-    time.sleep(5)
     pop_win_process(driver, task_num)
     result = get_highest_price(driver, task_num)
     if result is False:
